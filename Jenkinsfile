@@ -1,15 +1,21 @@
 node{
     
-    def mavenHome, mavenCMD, docker, tag, dockerHubUser, containerName, httpPort = ""
-    
-    stage('Prepare Environment'){
-        echo 'Initialize Environment'
-        mavenHome = tool name: 'maven' , type: 'maven'
-        mavenCMD = "${mavenHome}/bin/mvn"
-        tag="3.0"
-	dockerHubUser="anujsharma1990"
-	containerName="insure-me"
-	httpPort="8081"
+    def docker, tag, dockerHubUser, backendContainerName, frontendContainerName,
+    backendHttpPort, frontendHttpPort = ""
+     stage('Prepare Environment'){
+       echo 'Initialize Environment'
+       tag="latest"
+                 withCredentials([usernamePassword(credentialsId: 'dockerHubAccount',
+
+    usernameVariable: 'mohini2000', passwordVariable: 'Mohini@345')]) {
+
+                       dockerHubUser="$dockerUser"
+
+    }
+                backendContainerName="insure-me-backend"
+                frontendContainerName="insure-me-frontend"
+                backendHttpPort="8080"
+                frontendHttpPort="3000"
     }
     
     stage('Code Checkout'){
@@ -25,19 +31,36 @@ node{
         }
     }
     
-    stage('Maven Build'){
-        sh "${mavenCMD} clean package"        
+    stage('Backend Maven Build'){
+         sh "mvn clean package"        
     }
-    
+    stage('FrontEnd NodeJS Build'){
+        dir("frontend"){
+                   sh """
+                           npm install
+                           npm run test
+                           npm run build
+                    """
+          }
+    } 
     stage('Publish Test Reports'){
         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
     }
     
-    stage('Docker Image Build'){
+    stage('Backend Docker Image Build'){
         echo 'Creating Docker image'
-        sh "docker build -t $dockerHubUser/$containerName:$tag --pull --no-cache ."
-    }
-	
+        sh "docker build -t $dockerHubUser/$backendcontainerName:$tag --pull --no-cache ."
+      }
+      stage('Frontend Docker Image Build'){
+       dir("frontend"){
+
+                        echo 'Creating Docker image'
+                        sh "docker build -t $dockerHubUser/$frontendContainerName:$tag --pull
+
+    --no-cache ."
+                   }
+
+      }
     stage('Docker Image Scan'){
         echo 'Scanning Docker image for vulnerbilities'
         sh "docker build -t ${dockerHubUser}/insure-me:${tag} ."
