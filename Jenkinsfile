@@ -7,7 +7,7 @@ node{
        tag="latest"
                  withCredentials([usernamePassword(credentialsId: 'dockerHubAccount',
 
-    usernameVariable: 'mohini2000', passwordVariable: 'Mohini@345')]) {
+    usernameVariable: 'dockerUser', passwordVariable: 'dockerPassword')]) {
 
                        dockerHubUser="$dockerUser"
 
@@ -70,18 +70,21 @@ node{
         echo 'Pushing the docker image to DockerHub'
         withCredentials([usernamePassword(credentialsId: 'dockerHubAccount', usernameVariable: 'dockerUser', passwordVariable: 'dockerPassword')]) {
 			sh "docker login -u $dockerUser -p $dockerPassword"
-			sh "docker push $dockerUser/$containerName:$tag"
+			sh "docker push $dockerUser/$backendContainerName:$tag"
+		        sh "docker push$dockerUser/$frontendContainerName:$tag"
 			echo "Image push complete"
         } 
     }    
 	
 	stage('Docker Container Deployment'){
-		sh "docker rm $containerName -f"
-		sh "docker pull $dockerHubUser/$containerName:$tag"
-		sh "docker run -d --rm -p $httpPort:$httpPort --name $containerName $dockerHubUser/$containerName:$tag"
-		echo "Application started on port: ${httpPort} (http)"
+		node('DockerHost'){
+		sh "docker rm $backendContainerName -f"
+		sh "docker rm $frontendContainerName -f"
+		sh "docker run -d --rm -p $backendHttpPort:$backendHttpPort --name $backendContainerName $dockerHubUser/$backendContainerName:$tag"
+		sh "docker run -d --rm -p $frontendHttpPort:$frontendHttpPort --name $frontendContainerName $dockerHubUser/$frontendContainerName:$tag"
+		echo "Application started on port: ${frontendHttpPort} (http)"
 	}
 }
-
+}
 
 
