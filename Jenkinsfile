@@ -35,12 +35,12 @@ node{
          sh "mvn clean package"        
     }
     stage('FrontEnd NodeJS Build'){
-        
+        dir("frontend"){
                    sh """
                            npm install
                            npm run test
                            npm run build
-                    """
+           }         """
           
     } 
     stage('Publish Test Reports'){
