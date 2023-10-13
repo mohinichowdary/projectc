@@ -35,13 +35,13 @@ node{
          sh "mvn clean package"        
     }
     stage('FrontEnd NodeJS Build'){
-        ("frontend"){
+        
                    sh """
                            npm install
                            npm run test
                            npm run build
                     """
-          }
+          
     } 
     stage('Publish Test Reports'){
         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
