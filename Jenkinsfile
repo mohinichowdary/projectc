@@ -35,7 +35,7 @@ node{
          sh "mvn clean package"        
     }
     stage('FrontEnd NodeJS Build'){
-        dir("frontend"){
+        ("frontend"){
                    sh """
                            npm install
                            npm run test
