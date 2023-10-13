@@ -55,9 +55,9 @@ node{
        dir("frontend"){
 
                         echo 'Creating Docker image'
-                        sh "docker build -t $dockerHubUser/$frontendContainerName:$tag --pull
+                        sh "docker build -t $dockerHubUser/$frontendContainerName:$tag --pull --no-cache ."
 
-    --no-cache ."
+    
                    }
 
       }
