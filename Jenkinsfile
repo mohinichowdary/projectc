@@ -85,4 +85,5 @@ node{
 		echo "Application started on port: ${frontendHttpPort} (http)"
 	}
 }
-}
+
+    }
