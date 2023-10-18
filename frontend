@@ -1,3 +1,5 @@
+cd frontend
+
 FROM node:16
 
 ENV HOME=/home/app
