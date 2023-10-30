@@ -44,9 +44,6 @@ node{
 	}
     } 
     
-        
-    
-    
     stage('Backend Docker Image Build'){
         echo 'Creating Docker image'
         sh "docker build -t $dockerHubUser/$backendcontainerName:$tag --pull --no-cache ."
